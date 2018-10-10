@@ -3,6 +3,7 @@ import { Http, Response } from '@angular/http';
 import { RecipeService } from '../recipes/recipe.service';
 import { Recipe } from '../recipes/recipe.model';
 import { map } from 'rxjs/operators';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ import { map } from 'rxjs/operators';
 export class DataStorageService {
 
   constructor(private http: Http,
-              private recipeService: RecipeService ) { }
+              private recipeService: RecipeService,
+              private authService: AuthService ) { }
 
   storeRecipes() {
     // put overwrites data in firebase
@@ -19,7 +21,9 @@ export class DataStorageService {
   }
 
   getRecipes(){
-    this.http.get('https://shopping-app-udemy.firebaseio.com/recipes.json')
+    const token = this.authService.getToken();
+
+    this.http.get('https://shopping-app-udemy.firebaseio.com/recipes.json?auth=' + token)
     .pipe(map(
         // map ensures that in situation when we get empty array of ingredients, it will pass empty array to setRecipes
         (response: Response) => {
